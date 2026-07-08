@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novo Florescer AI Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F1E8;
+  --sidebar:#1A2E1B;
+  --sidebar-2:#243b25;
+  --card:#ffffff;
+  --ink:#2b2b2b;
+  --muted:#6b6b6b;
+  --line:#e7e2d4;
+  --radius:12px;
+  --gold:#c9a227;
+  --blush:#e8b8c4;
+  --shadow:0 4px 18px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.serif{font-family:'Cormorant Garamond',serif;font-weight:600}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:260px;background:var(--sidebar);color:#eef3ea;
+  position:fixed;top:0;left:0;bottom:0;overflow-y:auto;
+  padding:22px 16px;z-index:50;transition:transform .3s ease;
+}
+.sidebar .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:14px}
+.sidebar .brand .logo{font-size:26px}
+.sidebar .brand b{font-family:'Cormorant Garamond',serif;font-size:20px;line-height:1.1;display:block}
+.sidebar .brand span{font-size:11px;opacity:.6;letter-spacing:.12em;text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;
+  cursor:pointer;color:#d6dccf;font-size:14px;margin-bottom:4px;transition:.2s;
+}
+.nav-item:hover{background:rgba(255,255,255,.06)}
+.nav-item.active{background:rgba(201,162,39,.18);color:#fff}
+.nav-item .ic{font-size:18px;width:22px;text-align:center}
+.nav-section{font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.45;padding:14px 12px 6px}
+
+.main{flex:1;margin-left:260px;min-width:0}
+.topbar{
+  position:sticky;top:0;z-index:20;background:linear-gradient(90deg,#fff,#fbf8ef);
+  border-bottom:1px solid var(--line);padding:14px 26px;display:flex;align-items:center;gap:14px;
+}
+.topbar .hamb{display:none;font-size:22px;cursor:pointer;background:none;border:none;color:var(--sidebar)}
+.topbar h1{font-size:24px;color:var(--sidebar)}
+.topbar .sub{color:var(--muted);font-size:13px;margin-left:auto}
+.content{padding:26px;max-width:1200px;margin:0 auto}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+.card h3{font-size:22px;margin-bottom:6px}
+.card .tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;background:#f0ece0;color:#5a5a5a;margin:3px 4px 3px 0}
+
+/* Page header gradient */
+.page-head{
+  background:linear-gradient(120deg,var(--sidebar),var(--sidebar-2));
+  color:#fff;border-radius:var(--radius);padding:26px;margin-bottom:22px;box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;gap:18px;
+}
+.page-head .ic{font-size:42px}
+.page-head h2{font-size:30px;color:#fff}
+.page-head p{opacity:.85;font-size:14px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.stat .n{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold)}
+.stat .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+/* Agent grid */
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.agent-chip{
+  border-radius:var(--radius);padding:16px;color:#fff;cursor:pointer;transition:.2s;box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,.1);
+}
+.agent-chip:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.agent-chip .ag{font-size:11px;opacity:.8;letter-spacing:.1em}
+.agent-chip .nm{font-family:'Cormorant Garamond',serif;font-size:22px;margin:2px 0}
+.agent-chip .rl{font-size:12px;opacity:.9}
+
+/* Chat */
+.chat-box{height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;padding:12px;background:#fbfaf3;margin-bottom:10px}
+.chat-msg{margin-bottom:8px;font-size:14px}
+.chat-msg.user{text-align:right;color:var(--sidebar)}
+.chat-msg.user b{color:#000}
+.chat-msg.bot b{color:var(--gold)}
+.chat-input{display:flex;gap:8px}
+.chat-input input{flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px}
+.chat-input button{padding:10px 18px;border:none;border-radius:10px;background:var(--sidebar);color:#fff;cursor:pointer;font-weight:500}
+.chat-input button:hover{background:var(--sidebar-2)}
+
+/* Catalog */
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:8px 16px;border-radius:20px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13px;color:var(--muted)}
+.tab.active{background:var(--sidebar);color:#fff;border-color:var(--sidebar)}
+.search{width:100%;padding:12px 16px;border:1px solid var(--line);border-radius:10px;font-size:14px;margin-bottom:16px;font-family:inherit}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.flower{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);transition:.2s}
+.flower:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.flower .swatches{display:flex;gap:4px;margin:8px 0}
+.flower .sw{width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,.1)}
+.flower h4{font-size:18px}
+.flower .sci{font-style:italic;color:var(--muted);font-size:12px}
+.flower .meta{font-size:11px;color:var(--muted);margin-top:6px}
+.flower .price{color:var(--gold);font-weight:600;margin-top:6px}
+
+.palette{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.palette .strip{display:flex;height:60px}
+.palette .strip div{flex:1}
+.palette .body{padding:12px}
+.palette h4{font-size:18px}
+.palette .meta{font-size:12px;color:var(--muted)}
+
+.bouquet{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.bouquet h4{font-size:18px}
+.bouquet .fl{font-size:12px;color:var(--muted);margin-top:4px}
+.bouquet .style{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#f0ece0;margin-top:8px}
+
+/* Export */
+.check{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff}
+.check input{width:18px;height:18px}
+.btn{padding:12px 22px;border:none;border-radius:10px;background:var(--gold);color:#fff;cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:var(--sidebar)}
+
+/* Loader */
+.loader-wrap{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .5s}
+.loader{position:relative;width:80px;height:80px}
+.petal{position:absolute;top:50%;left:50%;width:30px;height:30px;background:var(--blush);border-radius:0 50% 50% 50%;transform-origin:0 0;animation:spin 1.6s linear infinite;opacity:.85}
+.petal:nth-child(1){animation-delay:0s}
+.petal:nth-child(2){animation-delay:.12s;background:#f3c9d2}
+.petal:nth-child(3){animation-delay:.24s;background:#e8b8c4}
+.petal:nth-child(4){animation-delay:.36s;background:#d9a3b0}
+.petal:nth-child(5){animation-delay:.48s;background:var(--gold)}
+.loader-core{position:absolute;top:50%;left:50%;width:14px;height:14px;background:var(--gold);border-radius:50%;transform:translate(-50%,-50%);z-index:2}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-wrap p{margin-top:18px;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--sidebar)}
+
+/* Image upload */
+.upload{border:2px dashed var(--line);border-radius:var(--radius);padding:30px;text-align:center;cursor:pointer;color:var(--muted);background:#fbfaf3}
+.upload:hover{border-color:var(--gold);color:var(--gold)}
+.upload img{max-width:100%;border-radius:10px;margin-top:12px}
+.scan-result{margin-top:12px;font-size:13px}
+
+.section{display:none}
+.section.active{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
+.overlay.show{display:block}
+
+@media(max-width:860px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .topbar .hamb{display:block}
+}
+</style>
+</head>
+<body>
+
+<div class="loader-wrap" id="loader">
+  <div class="loader">
+    <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+    <div class="loader-core"></div>
+  </div>
+  <p>Novo Florescer AI Studio</p>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="logo">🌸</span>
+      <div><b>Novo Florescer</b><span>AI Studio</span></div>
+    </div>
+    <div class="nav-section">Navegação</div>
+    <div class="nav-item active" data-section="master"><span class="ic">✨</span> Master (Home)</div>
+    <div class="nav-item" data-section="agentes"><span class="ic">👥</span> Agentes</div>
+    <div class="nav-item" data-section="catalogo"><span class="ic">🌸</span> Catálogo</div>
+    <div class="nav-item" data-section="sobre"><span class="ic">📖</span> Sobre</div>
+    <div class="nav-item" data-section="exportar"><span class="ic">📦</span> Exportar</div>
+    <div class="nav-section">Equipe</div>
+    <div id="agentNav"></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="hamb" onclick="toggleSidebar()">☰</button>
+      <h1 id="pageTitle">Master</h1>
+      <span class="sub" id="pageSub">Coordenação Geral</span>
+    </header>
+
+    <div class="content">
+
+      <!-- MASTER -->
+      <section class="section active" id="sec-master">
+        <div class="page-head">
+          <span class="ic">🌸</span>
+          <div><h2>Aria — Coordenadora Geral</h2><p>AG01 · Master · Acolhe, organiza e delega com leveza dourada.</p></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="n" id="stAgents">7</div><div class="l">Agentes ativos</div></div>
+          <div class="stat"><div class="n" id="stFlowers">0</div><div class="l">Flores no catálogo</div></div>
+          <div class="stat"><div class="n" id="stPalettes">12</div><div class="l">Paletas</div></div>
+          <div class="stat"><div class="n" id="stBouquets">10</div><div class="l">Buquês</div></div>
+        </div>
+        <div class="card">
+          <h3>Resumo da Equipe</h3>
+          <p style="color:var(--muted);margin-bottom:14px">Olá, sou Aria 🌸. Cuido para que cada agente floresça no seu papel. Ative um agente abaixo para conversar com ele.</p>
+          <div class="agent-grid" id="masterAgents"></div>
+        </div>
+      </section>
+
+      <!-- AGENTES -->
+      <section class="section" id="sec-agentes">
+        <div class="page-head"><span class="ic">👥</span><div><h2>Equipe de Agentes</h2><p>Conheça cada especialista do estúdio.</p></div></div>
+        <div id="agentesContainer"></div>
+      </section>
+
+      <!-- CATALOGO -->
+      <section class="section" id="sec-catalogo">
+        <div class="page-head"><span class="ic">🌸</span><div><h2>Catálogo Floral</h2><p>Flores, paletas e buquês curados pelo estúdio.</p></div></div>
+        <input class="search" id="searchInput" placeholder="🔍 Buscar por nome de flor, paleta ou buquê...">
+        <div class="tabs">
+          <div class="tab active" data-tab="flores">Flores</div>
+          <div class="tab" data-tab="paletas">Paletas</div>
+          <div class="tab" data-tab="buques">Buquês</div>
+        </div>
+        <div id="tabFlores" class="grid"></div>
+        <div id="tabPaletas" class="grid" style="display:none"></div>
+        <div id="tabBuques" class="grid" style="display:none"></div>
+      </section>
+
+      <!-- SOBRE -->
+      <section class="section" id="sec-sobre">
+        <div class="page-head"><span class="ic">📖</span><div><h2>Sobre o Projeto</h2><p>Novo Florescer AI Studio</p></div></div>
+        <div class="card">
+          <h3>Novo Florescer AI Studio</h3>
+          <p style="color:var(--muted);margin:8px 0">Versão 2.0 · Estúdio floral inteligente com equipe de agentes especializados.</p>
+          <p>Este aplicativo reúne catálogo floral, paletas, buquês e uma equipe de agentes com personalidades próprias para apoiar o dia a dia de um estúdio de flores. Tudo roda localmente no navegador — a única dependência externa é a biblioteca JSZip para exportação, com fallback gracioso quando offline.</p>
+          <h4 style="margin-top:16px">Recursos</h4>
+          <ul style="margin:8px 0 0 20px;color:var(--muted);font-size:14px;line-height:1.8">
+            <li>7 agentes especializados + Aria (Master)</li>
+            <li>Catálogo com 50+ flores, 12 paletas e 10 buquês</li>
+            <li>Chat simulado com personalidade por agente</li>
+            <li>Upload de imagem para análise (Sage)</li>
+            <li>Exportação ZIP com CSV + JSON</li>
+            <li>Responsivo com sidebar retrátil</li>
+          </ul>
+          <h4 style="margin-top:16px">Contato</h4>
+          <p style="color:var(--muted);font-size:14px">contato@novoflorescer.studio · @novoflorescer</p>
+        </div>
+      </section>
+
+      <!-- EXPORTAR -->
+      <section class="section" id="sec-exportar">
+        <div class="page-head"><span class="ic">📦</span><div><h2>Exportar Dados</h2><p>Gere um arquivo ZIP com CSV e JSON.</p></div></div>
+        <div class="card">
+          <h3>Checklist de Exportação</h3>
+          <p style="color:var(--muted);margin-bottom:14px">Selecione o que deseja incluir no pacote.</p>
+          <div class="check"><input type="checkbox" id="exFlores" checked> <label for="exFlores">Flores (CSV + JSON)</label></div>
+          <div class="check"><input type="checkbox" id="exPaletas" checked> <label for="exPaletas">Paletas (JSON)</label></div>
+          <div class="check"><input type="checkbox" id="exBuques" checked> <label for="exBuques">Buquês (JSON)</label></div>
+          <div class="check"><input type="checkbox" id="exAgentes" checked> <label for="exAgentes">Agentes (JSON)</label></div>
+          <div class="check"><input type="checkbox" id="exResumo" checked> <label for="exResumo">Resumo (TXT)</label></div>
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" onclick="exportZip()">📦 Exportar ZIP</button>
+            <button class="btn sec" onclick="exportFallback()">⬇ Baixar JSON (fallback)</button>
+          </div>
+          <p id="exportStatus" style="margin-top:12px;font-size:13px;color:var(--muted)"></p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ DADOS ============ */
+const AGENTS = [
+  {id:'AG01',name:'Aria',emoji:'🌸',role:'Coordenadora Geral',color:'#c9a227',master:true,desc:'Acolhe, organiza e delega. Líder dourada da equipe.',tags:['liderança','acolhimento','delegação'],personality:'doce e organizadora'},
+  {id:'AG02',name:'Bloom',emoji:'💰',role:'Diretor Comercial',color:'#1A2E1B',desc:'Vendas, propostas, contratos e orçamentos.',tags:['vendas','propostas','contratos','orçamentos'],personality:'objetivo e comercial'},
+  {id:'AG03',name:'Flora',emoji:'👰',role:'Consultora de Noivas',color:'#e8b8c4',desc:'Briefing, atendimento e jornada emocional da noiva.',tags:['briefing','noivas','emoção','jornada'],personality:'empática e sonhadora'},
+  {id:'AG04',name:'Lumière',emoji:'🌿',role:'Diretor Criativo Floral',color:'#8a9a7b',desc:'Criação floral, paletas, estilos e tendências.',tags:['criação','paletas','tendências'],personality:'artista e inspirado'},
+  {id:'AG05',name:'Petal',emoji:'📋',role:'Gerente de Produção',color:'#2c5f6f',desc:'Cronogramas, logística, equipe e execução.',tags:['cronograma','logística','execução'],personality:'metódico e prático'},
+  {id:'AG06',name:'Verde',emoji:'📱',role:'Diretor de Marketing',color:'#7fd1b9',desc:'Instagram, conteúdo, SEO e anúncios.',tags:['instagram','conteúdo','seo','anúncios'],personality:'criativo e digital'},
+  {id:'AG07',name:'Aura',emoji:'📈',role:'CEO Estratégico',color:'#9c7a1a',desc:'Indicadores, crescimento, planejamento e lucro.',tags:['indicadores','crescimento','lucro'],personality:'analítico e visionário'},
+  {id:'AG08',name:'Sage',emoji:'🔍',role:'Diretor de Engenharia por Imagem',color:'#6b7a8f',desc:'Visão computacional, identificação floral e análise técnica.',tags:['visão computacional','imagem','análise'],personality:'técnico e preciso'}
+];
+
+const FLOWERS = [
+  {nome:'Rosa',sci:'Rosa gallica',estacao:'Ano Todo',cores:['#e03e3e','#f7c6c6','#ffffff'],durabilidade:'7 dias',significado:'amor',estilos:['clássico','romântico'],custo:8},
+  {nome:'Tulipa',sci:'Tulipa gesneriana',estacao:'Primavera',cores:['#ff8fa3','#ffd166','#9b5de5'],durabilidade:'5 dias',significado:'declaração',estilos:['moderno','primavera'],custo:6},
+  {nome:'Girassol',sci:'Helianthus annuus',estacao:'Verão',cores:['#ffcc00','#8b5a00'],durabilidade:'10 dias',significado:'alegria',estilos:['rústico','moderno'],custo:7},
+  {nome:'Lírio',sci:'Lilium candidum',estacao:'Verão',cores:['#ffffff','#ffcc66'],durabilidade:'10 dias',significado:'pureza',estilos:['clássico','elegante'],custo:12},
+  {nome:'Orquídea',sci:'Phalaenopsis amabilis',estacao:'Ano Todo',cores:['#d96bd0','#ffffff','#ffcc99'],durabilidade:'20 dias',significado:'beleza',estilos:['elegante','moderno'],custo:25},
+  {nome:'Peônia',sci:'Paeonia officinalis',estacao:'Primavera',cores:['#ffb3c6','#ffffff'],durabilidade:'6 dias',significado:'prosperidade',estilos:['romântico','luxo'],custo:18},
+  {nome:'Hortênsia',sci:'Hydrangea macrophylla',estacao:'Verão',cores:['#a0c4ff','#ffb3c6','#9b8bf0'],durabilidade:'8 dias',significado:'sinceridade',estilos:['moderno','volume'],custo:14},
+  {nome:'Dália',sci:'Dahlia pinnata',estacao:'Outono',cores:['#ff6b6b','#ffd166','#c77dff'],durabilidade:'7 dias',significado:'dignidade',estilos:['vintage','outono'],custo:10},
+  {nome:'Cravo',sci:'Dianthus caryophyllus',estacao:'Ano Todo',cores:['#ff5a5f','#ffffff','#ffcc66'],durabilidade:'12 dias',significado:'admiração',estilos:['clássico'],custo:5},
+  {nome:'Marguerita',sci:'Leucanthemum vulgare',estacao:'Primavera',cores:['#ffffff','#ffd700'],durabilidade:'8 dias',significado:'inocência',estilos:['rústico','campo'],custo:4},
+  {nome:'Lavanda',sci:'Lavandula angustifolia',estacao:'Verão',cores:['#9b7ede','#bfa8d4'],durabilidade:'15 dias',significado:'tranquilidade',estilos:['rústico','aromático'],custo:9},
+  {nome:'Astromélia',sci:'Alstroemeria aurea',estacao:'Ano Todo',cores:['#ff8fa3','#ffd166','#a0c4ff'],durabilidade:'12 dias',significado:'amizade',estilos:['moderno','clássico'],custo:6},
+  {nome:'Gipsófila',sci:'Gypsophila paniculata',estacao:'Ano Todo',cores:['#ffffff','#f0f0f0'],durabilidade:'10 dias',significado:'eternidade',estilos:['delicado','clássico'],custo:5},
+  {nome:'Antúrio',sci:'Anthurium andraeanum',estacao:'Ano Todo',cores:['#e03e3e','#ffffff','#ffcc66'],durabilidade:'20 dias',significado:'hospitalidade',estilos:['tropical','moderno'],custo:15},
+  {nome:'Begônia',sci:'Begonia semperflorens',estacao:'Verão',cores:['#ff6b9d','#ffd166'],durabilidade:'10 dias',significado:'cautela',estilos:['jardim','delicado'],custo:6},
+  {nome:'Camélia',sci:'Camellia japonica',estacao:'Inverno',cores:['#e03e3e','#ffffff','#ffb3c6'],durabilidade:'10 dias',significado:'perfeição',estilos:['clássico','elegante'],custo:11},
+  {nome:'Estrelícia',sci:'Strelitzia reginae',estacao:'Verão',cores:['#ff7f00','#1e90ff','#ffd700'],durabilidade:'15 dias',significado:'alegria',estilos:['tropical','exótico'],custo:20},
+  {nome:'Gérbera',sci:'Gerbera jamesonii',estacao:'Ano Todo',cores:['#ff5a5f','#ffd166','#ff8fa3','#a0c4ff'],durabilidade:'8 dias',significado:'inocência',estilos:['moderno','colorido'],custo:5},
+  {nome:'Jasmim',sci:'Jasminum officinale',estacao:'Primavera',cores:['#ffffff','#fff7e0'],durabilidade:'5 dias',significado:'amabilidade',estilos:['delicado','aromático'],custo:8},
+  {nome:'Magnólia',sci:'Magnolia grandiflora',estacao:'Primavera',cores:['#ffffff','#f3d9e0'],durabilidade:'6 dias',significado:'nobreza',estilos:['elegante','clássico'],custo:16},
+  {nome:'Copo-de-leite',sci:'Zantedeschia aethiopica',estacao:'Ano Todo',cores:['#ffffff','#ffd700'],durabilidade:'10 dias',significado:'pureza',estilos:['elegante','minimalista'],custo:10},
+  {nome:'Astromélia Real',sci:'Alstroemeria psittacina',estacao:'Outono',cores:['#c41e3a','#ffd700','#3b5d3b'],durabilidade:'12 dias',significado:'amizade firme',estilos:['moderno'],custo:7},
+  {nome:'Eucalipto',sci:'Eucalyptus globulus',estacao:'Ano Todo',cores:['#9bbf9b','#cfe0cf'],durabilidade:'15 dias',significado:'proteção',estilos:['rústico','moderno'],custo:5},
+  {nome:'Astromélia Peruana',sci:'Alstroemeria ligtu',estacao:'Primavera',cores:['#ff8fa3','#ffd166'],durabilidade:'12 dias',significado:'devoção',estilos:['moderno'],custo:7},
+  {nome:'Flor de Cerejeira',sci:'Prunus serrulata',estacao:'Primavera',cores:['#ffd1dc','#ffffff'],durabilidade:'4 dias',significado:'efemeridade',estilos:['romântico','oriental'],custo:18},
+  {nome:'Hortênsia Azul',sci:'Hydrangea serrata',estacao:'Verão',cores:['#3a7bd5','#a0c4ff'],durabilidade:'8 dias',significado:'sinceridade',estilos:['moderno'],custo:14},
+  {nome:'Ranúnculo',sci:'Ranunculus asiaticus',estacao:'Primavera',cores:['#ff6b9d','#ffd166','#ffffff'],durabilidade:'7 dias',significado:'encanto',estilos:['romântico','luxo'],custo:13},
+  {nome:'Anêmona',sci:'Anemone coronaria',estacao:'Outono',cores:['#e03e3e','#9b5de5','#ffffff'],durabilidade:'6 dias',significado:'expectativa',estilos:['moderno','artístico'],custo:11},
+  {nome:'Estátice',sci:'Limonium sinuatum',estacao:'Verão',cores:['#9b5de5','#ffd166','#ffffff'],durabilidade:'20 dias',significado:'lembrança',estilos:['secas','moderno'],custo:5},
+  {nome:'Helicônia',sci:'Heliconia rostrata',estacao:'Verão',cores:['#ff7f00','#ffd700'],durabilidade:'15 dias',significado:'vibrância',estilos:['tropical','exótico'],custo:17},
+  {nome:'Protea',sci:'Protea cynaroides',estacao:'Ano Todo',cores:['#c41e3a','#f5e6c8'],durabilidade:'18 dias',significado:'coragem',estilos:['exótico','luxo'],custo:30},
+  {nome:'Açafrão',sci:'Crocus sativus',estacao:'Outono',cores:['#ff8c00','#9b5de5'],durabilidade:'5 dias',significado:'alegria',estilos:['rústico'],custo:9},
+  {nome:'Margarida Africana',sci:'Dimorphotheca ecklonis',estacao:'Primavera',cores:['#ff8fa3','#ffd166','#ffffff'],durabilidade:'7 dias',significado:'otimismo',estilos:['campo','moderno'],custo:5},
+  /* NOVAS 36 */
+  {nome:'Flor de Cacto',sci:'Echinopsis spp.',estacao:'Verão',cores:['#ff6b9d','#ffd166'],durabilidade:'5 dias',significado:'resiliência',estilos:['exótico','deserto'],custo:12},
+  {nome:'Suculenta Echeveria',sci:'Echeveria elegans',estacao:'Ano Todo',cores:[' ['#9bbf9b','#cfe0cf','#ff8fa3'],durabilidade:'30 dias',significado:'persistência',estilos:['moderno','minimalista'],custo:10},
+  {nome:'Bromélia',sci:'Aechmea fasciata',estacao:'Ano Todo',cores:['#ff4d6d','#9b5de5','#ffd166'],durabilidade:'25 dias',significado:'hospitalidade',estilos:['tropical','exótico'],custo:18},
+  {nome:'Gardênia',sci:'Gardenia jasminoides',estacao:'Primavera',cores:['#ffffff','#fff7e0'],durabilidade:'5 dias',significado:'amor secreto',estilos:['elegante','aromático'],custo:14},
+  {nome:'Ipê',sci:'Handroanthus spp.',estacao:'Inverno',cores:['#ffd700','#ff8c00','#ff6b9d'],durabilidade:'6 dias',significado:'força',estilos:['tropical','nacional'],custo:8},
+  {nome:'Alecrim',sci:'Salvia rosmarinus',estacao:'Ano Todo',cores:[' ['#9bbf9b','#3b5d3b'],durabilidade:'20 dias',significado:'memória',estilos:['rústico','aromático'],custo:5},
+  {nome:'Hortelã',sci:'Mentha spicata',estacao:'Ano Todo',cores:[' ['#7fd1b9','#3b5d3b'],durabilidade:'15 dias',significado:'hospitalidade',estilos:['rústico','aromático'],custo:4},
+  {nome:'Manjericão Roxo',sci:'Ocimum basilicum var. purpurascens',estacao:'Verão',cores:[' ['#7b2d8e','#9b5de5'],durabilidade:'12 dias',significado:'proteção',estilos:['rústico','aromático'],custo:4},
+  {nome:'Capim-dos-pampas',sci:'Cortaderia selloana',estacao:'Outono',cores:[' ['#f5e6c8','#e8d5b7'],durabilidade:'30 dias',significado:'liberdade',estilos:['moderno','rústico'],custo:8},
+  {nome:'Lotus',sci:'Nelumbo nucifera',estacao:'Verão',cores:[' ['#ff8fa3','#ffffff','#ffd700'],durabilidade:'7 dias',significado:'pureza espiritual',estilos:['oriental','elegante'],custo:22},
+  {nome:'Calla',sci:'Zantedeschia elliottiana',estacao:'Ano Todo',cores:[' ['#ffd700','#ff6b9d','#ffffff'],durabilidade:'10 dias',significado:'elegância',estilos:['elegante','minimalista'],custo:11},
+  {nome:'Amaranto',sci:'Amaranthus caudatus',estacao:'Outono',cores:[' ['#c41e3a','#9b2d1f'],durabilidade:'15 dias',significado:'imortalidade',estilos:['vintage','dramático'],custo:7},
+  {nome:'Celosia',sci:'Celosia argentea',estacao:'Verão',cores:[' ['#ff6b00','#ff4d6d','#ffd166'],durabilidade:'10 dias',significado:'afeição',estilos:['moderno','dramático'],custo:6},
+  {nome:'Echinacea',sci:'Echinacea purpurea',estacao:'Verão',cores:[' ['#c77dff','#ff8c00','#ffffff'],durabilidade:'10 dias',significado:'saúde',estilos:['campo','rústico'],custo:7},
+  {nome:'Crisântemo',sci:'Chrysanthemum morifolium',estacao:'Outono',cores:[' ['#ffd700','#ff6b00','#ffffff','#c77dff'],durabilidade:'18 dias',significado:'longevidade',estilos:['clássico','outono'],custo:6},
+  {nome:'Cyclamen',sci:'Cyclamen persicum',estacao:'Inverno',cores:[' ['#e03e3e','#ff8fa3','#ffffff'],durabilidade:'10 dias',significado:'timidez',estilos:['delicado','inverno'],custo:9},
+  {nome:'Freesia',sci:'Freesia refracta',estacao:'Primavera',cores:[' ['#ffd166','#ffffff','#ff8fa3','#9b5de5'],durabilidade:'8 dias',significado:'confiança',estilos:['delicado','aromático'],custo:8},
+  {nome:'Gladíolo',sci:'Gladiolus hortulanus',estacao:'Verão',cores:[' ['#ff4d6d','#ffd166','#9b5de5','#ffffff'],durabilidade:'9 dias',significado:'força de caráter',estilos:['clássico','vertical'],custo:7},
+  {nome:'Íris',sci:'Iris germanica',estacao:'Primavera',cores:[' ['#3a7bd5','#9b5de5','#ffffff'],durabilidade:'5 dias',significado:'sabedoria',estilos:['elegante','artístico'],custo:9},
+  {nome:'Jacinto',sci:'Hyacinthus orientalis',estacao:'Primavera',cores:[' ['#9b5de5','#ff8fa3','#ffffff','#ffd166'],durabilidade:'7 dias',significado:'sinceridade',estilos:['aromático','primavera'],custo:8},
+  {nome:'Kalanchoe',sci:'Kalanchoe blossfeldiana',estacao:'Inverno',cores:[' ['#ff4d6d','#ffd166','#ff8fa3','#ffffff'],durabilidade:'20 dias',significado:'persistência',estilos:['moderno','suculenta'],custo:7},
+  {nome:'Liatris',sci:'Liatris spicata',estacao:'Verão',cores:[' ['#9b5de5','#c77dff'],durabilidade:'10 dias',significado:'alegria',estilos:['vertical','campo'],custo:6},
+  {nome:'Lírio-do-vale',sci:'Convallaria majalis',estacao:'Primavera',cores:[' ['#ffffff','#e8f5e0'],durabilidade:'6 dias',significado:'felicidade',estilos:['delicado','romântico'],custo:12},
+  {nome:'Narciso',sci:'Narcissus pseudonarcissus',estacao:'Primavera',cores:[' ['#ffd700','#ffffff','#ffd166'],durabilidade:'7 dias',significado:'renovação',estilos:['primavera','clássico'],custo:6},
+  {nome:'Nardo',sci:'Polianthes tuberosa',estacao:'Verão',cores:[' ['#ffffff','#fff7e0'],durabilidade:'8 dias',significado:'prazer',estilos:['elegante','aromático'],custo:10},
+  {nome:'Nenúfar',sci:'Nymphaea alba',estacao:'Verão',cores:[' ['#ffffff','#ff8fa3','#ffd166'],durabilidade:'5 dias',significado:'pureza',estilos:['aquático','oriental'],custo:16},
+  {nome:'Papoula',sci:'Papaver rhoeas',estacao:'Primavera',cores:[' ['#e03e3e','#ff4d6d','#000000'],durabilidade:'4 dias',significado:'lembrança',estilos:['campo','artístico'],custo:6},
+  {nome:'Petúnia',sci:'Petunia hybrida',estacao:'Verão',cores:[' ['#9b5de5','#ff8fa3','#ffffff','#ffd166'],durabilidade:'6 dias',significado:'ressentimento',estilos:['jardim','colorido'],custo:4},
+  {nome:'Prímula',sci:'Primula vulgaris',estacao:'Primavera',cores:[' ['#ffd166','#ff8fa3','#9b5de5','#ffffff'],durabilidade:'7 dias',significado:'juventude',estilos:['delicado','primavera'],custo:5},
+  {nome:'Serralha',sci:'Emilia sonchifolia',estacao:'Ano Todo',cores:[' ['#ff4d6d','#c41e3a'],durabilidade:'5 dias',significado:'afeto',estilos:['campo','silvestre'],custo:3},
+  {nome:'Tomilho',sci:'Thymus vulgaris',estacao:'Ano Todo',cores:[' ['#9bbf9b','#e8d5b7'],durabilidade:'20 dias',significado:'coragem',estilos:['rústico','aromático'],custo:4},
+  {nome:'Verbena',sci:'Verbena hybrida',estacao:'Verão',cores:[' ['#9b5de5','#ff4d6d','#ff8fa3','#ffffff'],durabilidade:'8 dias',significado:'encanto',estilos:['jardim','colorido'],custo:5},
+  {nome:'Zínia',sci:'Zinnia elegans',estacao:'Verão',cores:[' ['#ff6b00','#ff4d6d','#ffd166','#9b5de5','#ffffff'],durabilidade:'10 dias',significado:'amizade',estilos:['campo','colorido'],custo:4},
+  {nome:'Campânula',sci:'Campanula medium',estacao:'Primavera',cores:[' ['#3a7bd5','#ffffff','#ff8fa3'],durabilidade:'7 dias',significado:'gratidão',estilos:['delicado','romântico'],custo:7},
+  {nome:'Dedaleira',sci:'Digitalis purpurea',estacao:'Verão',cores:[' ['#9b5de5','#ff8fa3','#ffffff'],durabilidade:'6 dias',significado:'ambição',estilos:['vertical','artístico'],custo:8},
+  {nome:'Amor-perfeito',sci:'Viola tricolor',estacao:'Primavera',cores:[' ['#ffd166','#9b5de5','#ff8fa3','#3a7bd5'],durabilidade:'6 dias',significado:'lembrança',estilos:['delicado','primavera'],custo:4}
+];
+
+const PALETTES = [
+  {nome:'Branco Puro',estacao:'Ano Todo',estilo:'elegante',cores:['#ffffff','#f5f5f5','#e8e8e8']},
+  {nome:'Rosa Romântico',estacao:'Primavera',estilo:'romântico',cores:['#ffb3c6','#ff8fa3','#e03e3e']},
+  {nome:'Tons Terrosos',estacao:'Outono',estilo:'rústico',cores:['#8b5a2b','#c19a6b','#e8d5b7']},
+  {nome:'Tropical Vibrante',estacao:'Verão',estilo:'tropical',cores:['#ff7f00','#ffd700','#e03e3e']},
+  {nome:'Pastel Suave',estacao:'Primavera',estilo:'delicado',cores:['#ffd1dc','#d4e9ff','#fff3b0']},
+  {nome:'Verde Jardim',estacao:'Ano Todo',estilo:'natural',cores:['#3b5d3b','#7fd1b9','#cfe0cf']},
+  {nome:'Bordô Nobre',estacao:'Inverno',estilo:'luxo',cores:['#5b0e2d','#800020','#c41e3a']},
+  {nome:'Lilás Místico',estacao:'Primavera',estilo:'moderno',cores:['#9b5de5','#c77dff','#e0c3fc']},
+  {nome:'Dourado Luxo',estacao:'Ano Todo',estilo:'luxo',cores:['#c9a227','#ffd700','#f5e6c8']},
+  {nome:'Azul Sereno',estacao:'Verão',estilo:'minimalista',cores:['#3a7bd5','#a0c4ff','#e8f1ff']},
+  {nome:'Outono Dourado',estacao:'Outono',estilo:'acolhedor',cores:['#b5651d','#d4a017','#8b4513','#c77dff']},
+  {nome:'Primavera Floral',estacao:'Primavera',estilo:'vibrante',cores:['#ff8fa3','#ffd166','#c77dff','#9bbf9b']}
+];
+
+const BOUQUETS = [
+  {nome:'Romance Clássico',estilo:'clássico',flores:['Rosa','Gipsófila','Eucalipto']},
+  {nome:'Jardim de Primavera',estilo:'primavera',flores:['Tulipa','Ranúnculo','Prímula']},
+  {nome:'Tropical Sol',estilo:'tropical',flores:['Estrelícia','Helicônia','Antúrio']},
+  {nome:'Branco Eterno',estilo:'elegante',flores:['Lírio','Copo-de-leite','Gipsófila']},
+  {nome:'Campo Rústico',estilo:'rústico',flores:['Marguerita','Girassol','Lavanda']},
+  {nome:'Luxo Dourado',estilo:'luxo',flores:['Protea','Peônia','Eucalipto']},
+  {nome:'Outono Acolhedor',estilo:'outono',flores:['Dália','Crisântemo','Capim-dos-pampas']},
+  {nome:'Minimalista Moderno',estilo:'moderno',flores:['Calla','Orquídea','Eucalipto']},
+  {nome:'Chuva de Pétalas',estilo:'moderno',flores:['Rosa','Astromélia','Eucalipto']},
+  {nome:'Clássico Ivory',estilo:'clássico',flores:['Lírio','Orquídea','Gipsófila']}
+];
+
+/* ============ RENDER ============ */
+function el(id){return document.getElementById(id)}
+
+function renderMasterAgents(){
+  const c=el('masterAgents');c.innerHTML='';
+  AGENTS.filter(a=>!a.master).forEach(a=>{
+    const d=document.createElement('div');
+    d.className='agent-chip';d.style.background=a.color;
+    d.innerHTML=`<div class="ag">${a.id}</div><div class="nm">${a.emoji} ${a.name}</div><div class="rl">${a.role}</div>`;
+    d.onclick=()=>{goAgent(a.id);};
+    c.appendChild(d);
+  });
+}
+
+function renderAgentNav(){
+  const c=el('agentNav');c.innerHTML='';
+  AGENTS.filter(a=>!a.master).forEach(a=>{
+    const d=document.createElement('div');
+    d.className='nav-item';d.dataset.agent=a.id;
+    d.innerHTML=`<span class="ic">${a.emoji}</span> ${a.name}`;
+    d.onclick=()=>goAgent(a.id);
+    c.appendChild(d);
+  });
+}
+
+function renderAgentes(){
+  const c=el('agentesContainer');c.innerHTML='';
+  AGENTS.filter(a=>!a.master).forEach(a=>{
+    const card=document.createElement('div');
+    card.className='card';card.id='agent-'+a.id;
+    card.style.borderTop=`4px solid ${a.color}`;
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="width:48px;height:48px;border-radius:50%;background:${a.color};display:flex;align-items:center;justify-content:center;font-size:24px">${a.emoji}</div>
+        <div><h3 style="color:${a.color}">${a.name}</h3><div style="font-size:12px;color:var(--muted)">${a.id} · ${a.role}</div></div>
+      </div>
+      <p style="color:var(--muted);margin-bottom:10px">${a.desc}</p>
+      <div style="margin-bottom:12px">${a.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      ${a.id==='AG08'?`
+        <div class="upload" id="up-${a.id}" onclick="triggerUpload('${a.id}')">
+          📷 Clique para enviar uma imagem floral (simulado)
+          <div id="prev-${a.id}"></div>
+        </div>
+        <input type="file" id="file-${a.id}" accept="image/*" style="display:none" onchange="handleUpload('${a.id}',this)">
+        <div class="scan-result" id="scan-${a.id}"></div>
+      `:''}
+      <div class="chat-box" id="chat-${a.id}"></div>
+      <div class="chat-input">
+        <input id="in-${a.id}" placeholder="Converse com ${a.name}..." onkeydown="if(event.key==='Enter')sendChat('${a.id}')">
+        <button onclick="sendChat('${a.id}')">Enviar</button>
+      </div>
+    `;
+    c.appendChild(card);
+  });
+}
+
+function renderFlowers(filter=''){
+  const c=el('tabFlores');c.innerHTML='';
+  const f=filter.toLowerCase();
+  FLOWERS.filter(x=>x.nome.toLowerCase().includes(f)||x.sci.toLowerCase().includes(f)).forEach(fl=>{
+    const d=document.createElement('div');d.className='flower';
+    d.innerHTML=`
+      <h4>${fl.nome}</h4>
+      <div class="sci">${fl.sci}</div>
+      <div class="swatches">${fl.cores.map(c=>`<div class="sw" style="background:${c}"></div>`).join('')}</div>
+      <div class="meta">📅 ${fl.estacao} · ⏳ ${fl.durabilidade}</div>
+      <div class="meta">💭 ${fl.significado}</div>
+      <div class="meta">🎨 ${fl.estilos.join(', ')}</div>
+      <div class="price">R$ ${fl.custo},00</div>
+    `;
+    c.appendChild(d);
+  });
+  if(!c.children.length)c.innerHTML='<p style="color:var(--muted)">Nenhuma flor encontrada.</p>';
+}
+
+function renderPalettes(filter=''){const c=el('tabPaletas');c.innerHTML='';const f=filter.toLowerCase();PALETTES.filter(p=>p.nome.toLowerCase().includes(f)).forEach(p=>{const d=document.createElement('div');d.className='palette';d.innerHTML=`<div class="strip">${p.cores.map(c=>`<div style="background:${c}"></div>`).join('')}</div><div class="body"><h4>${p.nome}</h4><div class="meta">${p.estacao} · ${p.estilo}</div></div>`;c.appendChild(d);});}
+
+function renderBouquets(filter=''){const c=el('tabBuques');c.innerHTML='';const f=filter.toLowerCase();BOUQUETS.filter(b=>b.nome.toLowerCase().includes(f)||b.flores.join(' ').toLowerCase().includes(f)).forEach(b=>{const d=document.createElement('div');d.className='bouquet';d.innerHTML=`<h4>${b.nome}</h4><div class="fl">💐 ${b.flores.join(' · ')}</div><span class="style">${b.estilo}</span>`;c.appendChild(d);});}
+
+/* ============ NAVEGAÇÃO ============ */
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el('sec-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item[data-section]').forEach(n=>n.classList.toggle('active',n.dataset.section===id));
+  const titles={master:['Master','Coordenação Geral'],agentes:['Agentes','Equipe especializada'],catalogo:['Catálogo','Flores, paletas e buquês'],sobre:['Sobre','Informações do projeto'],exportar:['Exportar','Pacote de dados']};
+  el('pageTitle').textContent=titles[id][0];el('pageSub').textContent=titles[id][1];
+  if(window.innerWidth<=860)closeSidebar();
+}
+
+function goAgent(id){
+  showSection('agentes');
+  setTimeout(()=>{const t=el('agent-'+id);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});},100);
+}
+
+document.querySelectorAll('.nav-item[data-section]').forEach(n=>n.onclick=()=>showSection(n.dataset.section));
+
+/* ============ TABS CATÁLOGO ============ */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  el('tabFlores').style.display=t.dataset.tab==='flores'?'grid':'none';
+  el('tabPaletas').style.display=t.dataset.tab==='paletas'?'grid':'none';
+  el('tabBuques').style.display=t.dataset.tab==='buques'?'grid':'none';
+});
+
+el('searchInput').oninput=e=>{const v=e.target.value;renderFlowers(v);renderPalettes(v);renderBouquets(v);};
+
+/* ============ CHAT ============ */
+function agentReply(a,msg){
+  const m=msg.toLowerCase();
+  const replies={
+    'AG02':['Vamos fechar essa proposta! Qual o ticket médio esperado?','Foco em conversão — preparei um orçamento competitivo.','Contrato enviado. Acompanhamento em 48h.'],
+    'AG03':['Que linda jornada! Me conte mais sobre o grande dia 🌸','Vamos capturar a emoção da noiva no briefing.','Cada detalhe conta uma história de amor.'],
+    'AG04':['Estou vendo uma paleta sálvia com toques dourados 🌿','Tendência atual: arranjos orgânicos e assimétricos.','A criatividade floresce quando sentimos a emoção.'],
+    'AG05':['Cronograma atualizado. Logística confirmada para a data.','Equipe escalada, insumos reservados. Tudo sob controle.','Execução impecável é meu compromisso.'],
+    'AG06':['Conteúdo para Instagram pronto! Reels em alta 📱','SEO local otimizado para "flores para casamento".','Vamos impulsionar essa campanha com anúncios segmentados.'],
+    'AG07':['Margem saudável, crescimento sustentável 📈','Indicadores apontam expansão para o próximo trimestre.','Planejamento estratégico define o lucro do ano.'],
+    'AG08':['Analisando imagem... identifiquei estrutura floral com 92% de confiança 🔍','Visão computacional detecta padrões de pétalas e coloração.','Análise técnica concluída — relatório disponível.']
+  };
+  const arr=replies[a.id]||['Estou aqui para ajudar 🌸'];
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function sendChat(id){
+  const a=AGENTS.find(x=>x.id===id);if(!a)return;
+  const inp=el('in-'+id);const box=el('chat-'+id);const msg=inp.value.trim();if(!msg)return;
+  box.innerHTML+=`<div class="chat-msg user"><b>Você:</b> ${msg}</div>`;
+  inp.value='';
+  box.innerHTML+=`<div class="chat-msg bot"><b>${a.emoji} ${a.name}:</b> ${agentReply(a,msg)}</div>`;
+  box.scrollTop=box.scrollHeight;
+}
+
+/* ============ UPLOAD SAGE ============ */
+function triggerUpload(id){el('file-'+id).click();}
+function handleUpload(id,input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    el('prev-'+id).innerHTML=`<img src="${e.target.result}" alt="preview">`;
+    const sample=FLOWERS[Math.floor(Math.random()*FLOWERS.length)];
+    el('scan-'+id).innerHTML=`🔍 <b>Análise (simulada):</b> Flor identificada: <b>${sample.nome}</b> (${sample.sci}) · Confiança: ${(85+Math.random()*14).toFixed(1)}% · Estação: ${sample.estacao}`;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============ SIDEBAR ============ */
+function toggleSidebar(){el('sidebar').classList.toggle('open');el('overlay').classList.toggle('show');}
+function closeSidebar(){el('sidebar').classList.remove('open');el('overlay').classList.remove('show');}
+
+/* ============ EXPORT ============ */
+function setExportStatus(t){el('exportStatus').textContent=t;}
+
+function buildData(){
+  const data={};
+  if(el('exFlores').checked)data.flowers=FLOWERS;
+  if(el('exPaletas').checked)data.palettes=PALETTES;
+  if(el('exBuques').checked)data.bouquets=BOUQUETS;
+  if(el('exAgentes').checked)data.agents=AGENTS;
+  if(el('exResumo').checked)data.resumo=`Novo Florescer AI Studio\nFlores: ${FLOWERS.length}\nPaletas: ${PALETTES.length}\nBuquês: ${BOUQUETS.length}\nAgentes: ${AGENTS.length}\nGerado em: ${new Date().toLocaleString('pt-BR')}`;
+  return data;
+}
+
+function toCSV(arr){
+  if(!arr||!arr.length)return'';
+  const keys=Object.keys(arr[0]);
+  const head=keys.join(',');
+  const rows=arr.map(o=>keys.map(k=>{const v=o[k];return Array.isArray(v)?'"'+v.join(';')+'"':String(v).replace(/,/g,';');}).join(','));
+  return [head,...rows].join('\n');
+}
+
+function download(filename,content,mime){
+  const blob=new Blob([content],{type:mime||'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function exportFallback(){
+  const data=buildData();download('novoflorescer.json',JSON.stringify(data,null,2),'application/json');
+  setExportStatus('✅ JSON baixado (modo fallback).');
+}
+
+function exportZip(){
+  setExportStatus('⏳ Preparando exportação...');
+  const data=buildData();
+  if(typeof JSZip==='undefined'){
+    setExportStatus('⚠️ JSZip indisponível (offline). Baixando JSON único como fallback...');
+    const script=document.createElement('script');
+    script.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    script.onload=()=>{setExportStatus('✅ JSZip carregado! Gerando ZIP...');doZip(data);};
+    script.onerror=()=>{setExportStatus('⚠️ Sem conexão. Usando fallback JSON.');exportFallback();};
+    document.body.appendChild(script);
+  }else{doZip(data);}
+}
+
+function doZip(data){
+  try{
+    const zip=new JSZip();
+    if(data.flowers){zip.file('flores.csv',toCSV(data.flowers));zip.file('flores.json',JSON.stringify(data.flowers,null,2));}
+    if(data.palettes)zip.file('paletas.json',JSON.stringify(data.palettes,null,2));
+    if(data.bouquets)zip.file('buques.json',JSON.stringify(data.bouquets,null,2));
+    if(data.agents)zip.file('agentes.json',JSON.stringify(data.agents,null,2));
+    if(data.resumo)zip.file('resumo.txt',data.resumo);
+    zip.file('tudo.json',JSON.stringify(data,null,2));
+    zip.generateAsync({type:'blob'}).then(blob=>{
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='novoflorescer.zip';a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+      setExportStatus('✅ ZIP gerado com sucesso!');
+    }).catch(()=>{setExportStatus('⚠️ Falha ao gerar ZIP. Usando fallback.');exportFallback();});
+  }catch(e){setExportStatus('⚠️ Erro: '+e.message+'. Usando fallback.');exportFallback();}
+}
+
+/* ============ INIT ============ */
+function init(){
+  el('stFlowers').textContent=FLOWERS.length;
+  renderMasterAgents();renderAgentNav();renderAgentes();renderFlowers();renderPalettes();renderBouquets();
+  setTimeout(()=>{const l=el('loader');l.style.opacity='0';setTimeout(()=>l.style.display='none',500);},1200);
+}
+init();
+</script>
+</body>
+</html>
